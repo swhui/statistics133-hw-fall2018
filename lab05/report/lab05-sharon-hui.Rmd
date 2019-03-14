@@ -1,0 +1,682 @@
+---
+title: "Lab 5: First contact with dplyr and ggplot2"
+author: "Sharon Hui"
+date: "9/29/2018"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = '../images/', warning = FALSE)
+```
+#### Manipulating and Visualizing Data Frames
+While you follow this lab, you may want to open these cheat sheets: 
+
+ - [dplyr cheatsheet](!https://github.com/ucb-stat133/stat133-fall-2018/blob/master/cheatsheets/data-transformation-cheatsheet.pdf)
+ 
+ - [ggplot2 cheatsheet](!https://github.com/ucb-stat133/stat133-fall-2018/blob/master/cheatsheets/ggplot2-cheatsheet-2.1.pdf)
+
+#### Filestructure and Shell Commands
+
+ - Open a command line interface (e.g. Terminal or GitBash)
+ 
+ - Change your working directory to a location where you will store all the materials for this lab
+ 
+ - Use `mkdir` to create a directory `lab05` for the lab materials
+ 
+ - Use `cd` to change directory to (i.e. move inside) `lab05`
+
+ - Create other subdirectories: `data`, `report`, `images`
+
+ - Use `ls` to list the contents of `lab05` and confirm that you have all the subdirectories.
+
+ - Use touch to create an empty `README.md` text file
+ 
+ - Use a text editor (e.g. the one in RStudio) to open the `README.md` file, and then add a brief description of today’s lab, using markdown syntax.
+ 
+ - Change directory to the `data/` folder.
+
+ - Download the data file with the command `curl`, and the `-O` option (letter O)
+
+ - Use ls to confirm that the csv file is in `data/`. 
+ 
+ - Use word count wc to count the lines of the csv file 
+ 
+ - Take a peek at the first rows of the csv file with head 
+ 
+ - Take a peek at the last 5 rows of the csv file with tail
+ 
+```{r, eval = FALSE}
+cd Desktop
+mkdir lab05
+cd lab05
+mkdir data
+mkdir report
+mkdir images
+ls
+touch README.md
+# added brief description of lab 05 with markdown syntax
+open README.md
+cd data
+curl -O https://raw.githubusercontent.com/ucb-stat133/stat133-fall-2018/master/data/nba2018-players.csv
+ls
+wc nba2018-players.csv
+head 5 nba2018-players.csv 
+tail 5 nba2018-players.csv
+
+```
+
+I will include this code, but I only need to run this command once to download `dplyr` and `ggplot2`.
+`install.packages(c("dplyr", "ggplot2"))`
+
+##### Installing Packages
+
+**About loading packages**: Another rule to keep in mind is to always load any required packages at the very top of your script files (`.R` or `.Rmd` or `.Rnw` files). Avoid calling the `library()` function in the middle of a script. Instead, load all the packages before anything else.
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+##### Path for Images
+
+The other important specification to include in your Rmd file is a global chunk option to specify the location of plots and graphics. This is done by setting the `fig.path` argument inside the `knitr::opts_chunk$set()` function.
+
+If you don’t specify `fig.path`, `"knitr"` will create a default directory to store all the plots produced when knitting an Rmd file. This time, however, we want to have more control over where things are placed. Because you already have a folder `images/` as part of the filestructure, this is where we want `"knitr"` to save all the generated graphics. Notice the use of a relative path `fig.path = '../images/'`. This is because your Rmd file should be inside the folder `report/`, but the folder `images/` is outside `report/` (i.e. in the same parent directory of `report/`). I did this part at the beginning of the Rmd file.
+
+#### NBA Players Data
+The data file for this lab is: `nba2018-players.csv`. To import the data in R you can use the base function `read.csv()`, or you can also use read_csv() from the package `"readr`":
+
+```{r}
+library(readr)
+setwd("/Users/sharonhui/Desktop/lab05/data")
+dat <- read_csv('nba2018-players.csv')
+```
+
+#### Basic "dplyr" verbs
+
+To make the learning process of "dplyr" gentler, Hadley Wickham proposes beginning with a set of five basic verbs or operations for data frames (each verb corresponds to a function in "dplyr"): 
+
+ - **filter**: keep rows matching criteria 
+ 
+ - **select**: pick columns by name 
+ 
+ - **mutate**: add new variables 
+ 
+ - **arrange**: reorder rows 
+ 
+ - **summarise**: reduce variables to values 
+ 
+Slightly modified Hadley’s list of verbs: 
+
+ - `filter()`, `slice()`, and `select()`: subsetting and selecting rows and columns 
+ 
+ - `mutate()`: add new variables 
+ 
+ - `arrange()`: reorder rows 
+ 
+ - `summarise()`: reduce variables to values 
+ 
+ - `group_by()`: grouped (aggregate) operations
+ 
+
+#### Filtering, slicing, and selecting
+
+`slice()` allows you to select rows by position  
+
+`filter()` allows you to select rows by condition.  
+
+`select()` allows you to select columns by name  
+
+```{r}
+three_rows <- slice(dat, 1:3)
+gt_85 <- filter(dat, height > 85)
+player_height <- select(dat, player, height)
+```
+
+
+Your turn: 
+
+ - use `slice()` to subset the data by selecting the first 5 rows.
+ 
+```{r}
+slice(dat, 1:5)
+```
+
+ - use `slice()` to subset the data by selecting rows 10, 15, 20, …, 50. 
+```{r}
+slice(dat, c(10, 15, 20, 25, 30, 35, 40, 50))
+
+```
+
+ - use `slice()` to subset the data by selecting the last 5 rows. 
+```{r}
+slice(dat, ((nrow(dat))-4):(nrow(dat)))
+# Another way to do this
+tail(slice(dat), 5)
+
+```
+
+ - use `filter()` to subset those players with height less than 70 inches tall. 
+```{r}
+filter(dat, dat$height < 70)
+
+```
+
+ - use `filter()` to subset rows of Golden State Warriors (‘GSW’). 
+```{r}
+filter(dat, dat$team == "GSW")
+
+```
+
+ - use `filter()` to subset rows of GSW centers (‘C’). 
+```{r}
+filter(dat, (dat$team =="GSW") & (dat$position == "C"))
+
+```
+
+ - use `filter()` and then `select()`, to subset rows of lakers (‘LAL’), and then display their names. 
+ 
+```{r}
+dat %>% 
+filter(dat$team == "LAL") %>% 
+select(player) 
+``` 
+
+ - use `filter()` and then `select()`, to display the name and salary, of GSW point guards
+```{r}
+dat %>% 
+filter(team == "GSW" & position == "PG") %>%
+select(player, salary)
+
+
+``` 
+
+ - find how to select the name, age, and team, of players with more than 10 years of experience, making 10 million dollars or less.
+```{r}
+dat %>% 
+filter(experience > 10 & salary <= 10000000) %>%
+select(player, age, team)
+
+```
+
+ - find how to select the name, team, height, and weight, of rookie players, 20 years old, displaying only the first five occurrences (i.e. rows)
+```{r}
+head(dat %>% 
+filter(experience == "0" & age == "20") %>%
+select(player, team, height, weight), 5)
+```
+
+----
+
+#### Adding new variables: mutate()
+
+Another basic verb is `mutate()` which allows you to add new variables. Let’s create a small data frame for the warriors with three columns: `player`, `height`, and `weight`:
+```{r}
+# creating a small data frame step by step
+gsw <- filter(dat, team == 'GSW')
+gsw <- select(gsw, player, height, weight)
+gsw <- slice(gsw, c(4, 8, 10, 14, 15))
+gsw
+
+```
+
+Now, let’s use `mutate()` to (temporarily) add a column with the ratio `height / weight`:
+
+```{r}
+mutate(gsw, height / weight)
+```
+
+Create a new name like `ht_wt = height / weight:`
+
+```{r}
+mutate(gsw, ht_wt = height / weight)
+```
+
+In order to permanently change the data, you need to assign the changes to an object:
+
+```{r}
+gsw2 <- mutate(gsw, ht_m = height * 0.0254, wt_kg = weight * 0.4536) 
+gsw2
+
+```
+
+#### Reordering rows: arrange()
+
+The next basic verb of "dplyr" is arrange() which allows you to reorder rows. For example, here’s how to arrange the rows of gsw by height
+```{r}
+arrange(gsw, height)
+```
+
+By default `arrange()` sorts rows in increasing order. To arrange rows in descending order you need to use the auxiliary function `desc()`.
+```{r}
+arrange(gsw, desc(height))
+```
+
+```{r}
+# order rows by height, and then weight
+arrange(gsw, height, weight)
+```
+
+##### Your Turn
+
+ - using the data frame `gsw`, add a new variable `product` with the product of `height` and `weight`.
+ 
+```{r}
+mutate(gsw, product = height * weight)
+```
+
+ - create a new data frame `gsw3`, by adding columns `log_height` and `log_weight` with the log transformations of height and weight.
+ 
+```{r}
+gsw3 <- mutate(gsw, log_height = log(height), log_weight = log(weight))
+```
+
+ - use the original data frame to `filter()` and `arrange()` those players with height less than 71 inches tall, in increasing order.
+ 
+```{r}
+new_dat <- filter(dat, dat$height < 71) 
+arrange(new_dat, new_dat$height)
+```
+
+ - display the name, team, and salary, of the top-5 highest paid players
+ 
+```{r}
+head(select(arrange(dat, desc(salary)), player, team, salary), 5)
+
+```
+
+ - display the name, team, and salary, for the top-5 highest paid players
+ 
+```{r}
+head(select(arrange(dat, desc(salary)), player, team, salary), 5)
+```
+ 
+ - display the name, team, and points3, of the top 10 three-point players
+
+```{r}
+head(select(arrange(dat, desc(points3)), player, team, points3), 10)
+# Another way
+slice(select(arrange(dat, desc(points3)), player, team, points3), 1:10)
+``` 
+
+ - create a data frame `gsw_mpg` of GSW players, that contains variables for `player name`, `experience`, and `min_per_game` (minutes per game), sorted by `min_per_game` (in descending order)
+ 
+```{r}
+data.frame(arrange(select(mutate(filter(dat, team == "GSW"), min_per_game = minutes/games), player, experience, min_per_game), desc(min_per_game)))
+``` 
+
+#### Summarizing values with `summarise()`
+
+The next verb is `summarise()`. Conceptually, this involves applying a function on one or more columns, in order to summarize values. This is probably easier to understand with one example.
+
+Say you are interested in calculating the average salary of all NBA players. To do this “a la dplyr” you use `summarise()`, or its synonym function `summarize()`:
+
+Calculating an average like this seems a bit verbose, especially when you can directly use `mean()` like this:
+
+```{r}
+# average salary of NBA players
+summarise(dat, avg_salary = mean(salary))
+mean(dat$salary)
+```
+
+ What if you want to calculate some summary statistics for salary: min, median, mean, and max?
+```{r}
+# some stats for salary (dplyr)
+summarise(
+  dat, 
+  min = min(salary),
+  median = median(salary),
+  avg = mean(salary),
+  max = max(salary)
+)
+```
+
+Well, this may still look like not much. You can do the same in base R (there are actually better ways to do this):
+ 
+```{r}
+# some stats for salary (base R) 
+
+c(min = min(dat$salary), median = median(dat$salary), median = mean(dat$salary), max = max(dat$salary))
+```
+
+##### Grouped operations
+
+To actually appreciate the power of `summarise()`, we need to introduce the other major basic verb in "dplyr": `group_by()`. This is the function that allows you to perform data aggregations, or grouped operations.
+
+Let’s see the combination of `summarise()` and `group_by()` to calculate the average salary by team:
+```{r}
+# average salary, grouped by team 
+summarise( group_by(dat, team), avg_salary = mean(salary) )
+
+# average salary, grouped by position
+summarise(
+  group_by(dat, position),
+  avg_salary = mean(salary)
+)
+
+# average weight and height, by position, displayed in desceding order by average height
+arrange(
+  summarise(
+    group_by(dat, position),
+    avg_height = mean(height),
+    avg_weight = mean(weight)),
+  desc(avg_height)
+)
+```
+
+#### Your turn: 
+
+use `summarise()` to get the largest height value.
+
+```{r}
+summarise(dat, largest_height_value = max(height))
+```
+
+
+use `summarise()` to get the standard deviation of points3. 
+
+```{r}
+summarise(dat, standard_deviation_of_points3 = sd(points3))
+```
+
+
+use summarise() and group_by() to display the median of three-points, by team.
+
+```{r}
+summarise(
+  group_by(dat, team),
+  median_points3 = median(points3)
+)
+```
+
+
+display the average triple points by team, in ascending order, of the bottom-5 teams (worst 3pointer teams).
+
+```{r}
+tail(arrange((summarise(
+   group_by(dat, team),
+    average_points3 = mean(points3)
+)), desc(average_points3)), 5)
+
+arrange((tail(arrange((summarise(
+   group_by(dat, team),
+    average_points3 = mean(points3)
+)), desc(average_points3)), 5)), (average_points3))
+```
+obtain the mean and standard deviation of age, for Power Forwards, with 5 and 10 years (including) years of experience.
+```{r}
+summarise(select(filter(dat, dat$position == "PF", dat$experience >=5 & dat$experience <= 10), age), mean_power_forwards = mean(age), sd_power_forwards = sd(age))
+```
+
+#### First contact with ggplot()
+
+ - The main function in "ggplot2" is `ggplot()`
+
+ - The main input to `ggplot()` is a data frame object.
+
+ - You can use the internal function `aes()` to specify what columns of the data frame will be used for the graphical elements of the plot.
+
+ - You must specify what kind of geometric objects or geoms will be displayed: e.g. `geom_point()`, `geom_bar()`, `geom_boxpot()`.
+
+ - Pretty much anything else that you want to add to your plot is controlled by auxiliary functions, especially those things that have to do with the format, rather than the underlying data.
+
+ - The construction of a ggplot is done by adding layers with the `+` operator.
+
+##### Scatterplots
+
+######Label your chunks! 
+
+When including code for plots and graphics, we strongly recommend that you create an individual code chunk for each plot, and that you give a label to that chunk.
+```{r scatterplotoption1}
+# scatterplot (option 1)
+ggplot(data = dat) +
+  geom_point(aes(x = points, y = salary))
+```
+
+ - `ggplot()` creates an object of class "ggplot"
+
+ - the main input for `ggplot()` is data which must be a data frame
+
+ - then we use the `"+"` operator to add a layer
+
+ - the geometric object (geom) are points: `geom_points()`
+
+ - `aes()` is used to specify the `x` and `y` coordinates, by taking columns `points` and `salary` from the data frame
+
+```{r scatterplotoption2}
+# scatterplot (option 2)
+ggplot(data = dat, aes(x = points, y = salary)) +
+  geom_point()
+```
+
+
+##### Adding color
+
+```{r scatterplotintermsofposition}
+# Say you want to color code the points in terms of position
+# colored scatterplot 
+ggplot(data = dat, aes(x = points, y = salary)) +
+  geom_point(aes(color = position))
+```
+
+
+
+```{r scatterplotsizedandcoloredpoint3}
+# Maybe you wan to modify the size of the dots in terms of points3:
+# sized and colored scatterplot 
+ggplot(data = dat, aes(x = points, y = salary)) +
+  geom_point(aes(color = position, size = points3))
+```
+
+```{r scatterplotwithalpha}
+# To add some transparency effect to the dots, you can use the alpha parameter.
+# sized and colored scatterplot 
+ggplot(data = dat, aes(x = points, y = salary)) +
+  geom_point(aes(color = position, size = points3), alpha = 0.7)
+
+```
+
+Notice that `alpha` was specified outside `aes()`. This is because we are not using any column for the `alpha` transparency values.
+
+
+##### Your Turn
+ - Open the ggplot2 cheatsheet 
+ 
+ - Use the data frame gsw to make a scatterplot of height and weight.
+
+```{r scaterplotwithheightandweight}
+ggplot(data = gsw, aes(x = height, y = weight)) + geom_point()
+```
+
+Find out how to make another scatterplot of height and weight, using `geom_text()` to display the names of the players.
+
+```{r scatterplotwithgeom_text}
+ggplot(data = gsw, aes(x = height, y = weight)) + 
+  geom_text(aes(label = player))
+```
+
+Get a scatter plot of height and weight, for ALL the warriors, displaying their names with `geom_label()`.
+
+```{r scatterplotwithgeom_label}
+ggplot(data = filter(dat, team == "GSW"), aes(x = height, y = weight)) + 
+  geom_point() + 
+  geom_label(aes(label = player))
+```
+
+Get a density plot of `salary` (for all NBA players).
+
+```{r geom_densitywithsalary}
+ggplot(data = dat, aes(x = dat$salary)) + geom_density()
+```
+
+Get a histogram of points2 with binwidth of 50 (for all NBA player
+
+```{r geom_histogramwithpoints2}
+ggplot(data = dat, aes(x=points2)) +
+  geom_histogram(bins = 50)
+```
+
+Get a barchart of the `position` frequencies (for all NBA players).
+
+```{r barchartofpositionfrequencies}
+ggplot(data = dat, aes( x= position)) +
+  geom_bar()
+```
+
+Make a scatterplot of `experience` and `salary` of all Centers, and use `geom_smooth()` to add a regression line.
+
+```{r scatterplotwitharegressionline}
+ggplot(data = filter(dat, dat$position == "C"), aes(x = experience, y = salary)) + geom_point(size = .2) + geom_smooth(method = lm)
+```
+
+
+Repeat the same scatterplot of `experience` and `salary` of all Centers, but now use `geom_smooth()` to add a loess line (i.e. smooth line).
+```{r scatterplotwithloessline}
+ggplot(data = filter(dat, dat$position == "C"), aes(x = experience, y = salary)) + geom_point(size = .2) + geom_smooth(method = loess)
+```
+
+##### Faceting
+
+One of the most attractive features of "ggplot2" is the ability to display multiple facets. The idea of facets is to divide a plot into subplots based on the values of one or more categorical (or discrete) variables.
+
+Here’s an example. What if you want to get scatterplots of points and salary separated (or grouped) by position? This is where faceting comes handy, and you can use facet_wrap() for this purpose:
+```{r scatterplotbyposition}
+# scatterplot by position
+ggplot(data = dat, aes(x = points, y = salary)) +
+  geom_point() +
+  facet_wrap(~ position)
+```
+
+The other faceting function is `facet_grid()`, which allows you to control the layout of the facets (by rows, by columns, etc)
+
+```{r scatterplotwithfacetgrid1}
+# scatterplot by position
+ggplot(data = dat, aes(x = points, y = salary)) +
+  geom_point(aes(color = position), alpha = 0.7) +
+  facet_grid(~ position) +
+  geom_smooth(method = loess)
+```
+
+```{r scatterplotwithfacetgrid2}
+# scatterplot by position
+ggplot(data = dat, aes(x = points, y = salary)) +
+  geom_point(aes(color = position), alpha = 0.7) +
+  facet_grid(position ~ .) +
+  geom_smooth(method = loess)
+```
+
+
+##### Your turn: 
+ 
+ - Make scatterplots of `experience` and `salary` faceting by `position`.
+```{r scatterplotofexperiencesalaryposition}
+# scatterplot by position
+ggplot(data = dat, aes(x = experience, y = salary)) +
+  geom_point(aes(color = position), alpha = 0.7) +
+  facet_grid(~ position) +
+  geom_smooth(method = loess)
+
+```
+
+ - Make scatterplots of `experience and salary` faceting by team 
+```{r scatterplotexperiencesalaryteam}
+
+# scatterplot by team
+ggplot(data = dat, aes(x = experience, y = salary)) +
+  geom_point(aes(color = team), alpha = 0.7) +
+  facet_wrap(team ~ .) +
+  geom_smooth(method = loess)
+
+```
+
+ - Make density plots of `age` faceting by `team`
+```{r densityplotofageteam}
+ggplot(data = dat, aes(x = age)) + geom_density() + facet_wrap(team ~ .)
+
+```
+ 
+ - Make scatterplots of `height` and `weight` faceting by `position`
+```{r scatterplotheightweightposition}
+ggplot(data = dat, aes(x = height, y = weight)) + geom_point(size = .5) + facet_wrap(position ~ .)
+
+```
+
+ - Make scatterplots of `height` and `weight`, with a 2-dimensional density, `geom_density2d()`, faceting by `position`
+```{r scatterplotheightweightgeom_density2d}
+options(warn=-1)
+# scatterplot by position
+ggplot(data = dat, aes(x = height, y = weight)) +
+  geom_point(aes(color = position), alpha = 0.7) +
+  facet_wrap(position ~ .) +
+  geom_smooth(method = loess) + geom_density2d()
+
+```
+ 
+ - Make a scatterplot of `experience` and `salary` for the Warriors, but this time add a layer with `theme_bw()` to get a simpler background 
+
+```{r scatterplotexperiencesalarywarriorstheme_bw}
+ggplot(data = filter(dat, dat$team == "GSW"), aes(x = experience, y = salary)) +
+  geom_point(size = .5) + theme_bw()
+
+```
+
+ - Repeat any of the previous plots but now adding a leyer with another theme e.g. `theme_minimal()`, `theme_dark()`, `theme_classic()`
+```{r repeatplotwiththeme_classic}
+ggplot(data = filter(dat, dat$team == "GSW"), aes(x = experience, y = salary)) +
+  geom_point(size = .5) + theme_classic()
+
+```
+
+##### More shell commands
+
+ - Open the terminal. 
+
+ - Move inside the images/ directory of the lab. 
+ 
+ - List the contents of this directory. 
+ 
+ - Now list the contents of the directory in long format. 
+ 
+ - How would you list the contents in long format, by time? 
+ 
+ - How would you list the contents displaying the results in reverse (alphabetical)? order 
+ 
+ - Without changing your current directory, create a directory copies at the parent level (i.e. lab05/). 
+ 
+ - Copy one of the PNG files to the copies folder. 
+ 
+ - Use the wildcard * to copy all the .png files in the directory copies. 
+ 
+ - Change to the directory copies. Use the command mv to rename some of your PNG files. 
+ 
+ - Change to the report/ directory. 
+ 
+ - From within report/, find out how to rename the directory copies as copy-files. 
+ 
+ - From within report/, delete one or two PNG files in copy-files. 
+ 
+ - From within report/, find out how to delete the directory copy-files.
+
+```{r, eval= FALSE}
+cd Desktop
+cd lab05
+cd images/
+ls
+ls -l
+ls -l -t
+ls -r -l
+mkdir ../copies
+cp scatterplotwithfacetgrid2-1.png ../copies
+cp *.png ../copies
+cd ..
+cd copies
+mv scatterplotwithfacetgrid2-1.png scatterplotwithfacetgrid2.png
+mv scatterplotwithfacetgrid1-1.png scatterplotwithafacetgridaboutposition.png
+mv scatterplotwithgeom_label-1.png scatterplotgeom_labelheightweight.png
+mv scatterplotofexperiencesalaryposition-1.png scatterplotexpsalpos.png
+cd ..
+cd report/
+mv ../copies ../copy-files
+rm ../copy-files/repeatplotwiththeme_classic-1.png
+rm ../copy-files/densityplotofageteam-1.png
+rm -R ../copy-files
+```

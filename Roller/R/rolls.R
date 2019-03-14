@@ -1,0 +1,258 @@
+#' @title Rolls function
+#' @description creates an object of class \code{"roll"}
+#' @param obj object of class \code{"roll"}
+#' @param times number of tosses
+#' @return an object of class \code{"roll"} with the following elements:
+#' @return \item{rolls}{vector of outputs of the rolls}
+#' @return \item{sides}{vector of "device" object \code{"sides"}}
+#' @return \item{prob}{vector of "device" object \code{"prob"}}
+#' @return \item{total}{total number of rolls ie times}
+#' @export
+#' @examples
+#'
+#' # default roll
+#' fair_coin <- device()
+#' default_roll <- roll(fair_coin)
+#'
+#' # using a regular die rolling 50 times
+#' regular_die <- device(sides = c("a", "b", "c", "d", "e", "f"), prob = c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6))
+#' regular50rolls <- roll(obj = regular_die, times = 50)
+#'
+#' # using a weird die 100 times
+#' weird_die <- device(sides = c("oranges", "plums", "apples", "bananas", "durians", "tomatoes"), prob = c(1/8, 1/8, 1/8, 1/8, 1/8, 3/8))
+#' weird100rolls <- roll(obj = weird_die, times = 100)
+
+roll <- function(obj, times = 1) {
+  if (is.device(obj) == FALSE) {
+    stop('device is not of class "device"')
+  }
+  if (length(obj$sides) != length(obj$prob)) {
+    stop("\n 'sides' and 'prob' have different lengths")
+  }
+  check_times(times)
+  turns <- sample(obj$sides, size = times, replace = TRUE, prob = obj$prob)
+  res <- list(
+    rolls = turns,
+    sides = obj$sides,
+    prob = obj$prob,
+    total = length(turns)
+  )
+  class(res) <- "rolls"
+  res
+}
+
+
+# private function to check vector of 'times'
+#' @title check_times function
+#' @description checks if the number of times is a positive integer
+#' @param times a numeric input
+#' @return TRUE if times is a positive integer or FALSE is times is not a positive integer
+#' @export
+#' @examples
+#' # check_times(4)
+#' # [1] TRUE
+#'
+#' # check_times(100)
+#' # [1] TRUE
+#'
+check_times <- function(times) {
+  if (times <= 0 | (times %% 1 != 0) | !is.numeric(times)) {
+    stop("\nargument 'times' must be a positive integer")
+  } else {
+    TRUE
+  }
+}
+
+#' @title is.rolls function
+#' @description checks if the input is of the class "rolls" or not
+#' @param rolls any input
+#' @return TRUE if the input is of class "roll" or stops/gives an error otherwise
+#' @export
+is.rolls <- function(rolls) {
+  if (class(rolls) != "rolls") {
+    stop("The class of the object is not rolls")
+  } else {
+    TRUE
+  }
+}
+
+
+#' @export
+print.rolls <- function(x, ...) {
+  cat('object "rolls"\n\n')
+  lst <- list(rolls = x$rolls)
+  print(lst)
+  invisible(x)
+}
+
+#' @title Summary function
+#' @description takes in rolls object and outputs the object class name "summary.rolls" and data frame with the "sides", "counts", and "prop" of the rolls
+#' @param x any input that is of the class "rolls"
+#' @return object class name "summary.rolls" and data frame with the "sides", "counts", and "prop" of the rolls
+#' @export
+#' @examples
+#' # roll fair 8-sided die
+#' # set.seed(123)
+#' # fair_dev <- device(sides = letters[1:8], prob = rep(1/8, 8))
+#' # fair500 <- roll(fair_dev, times = 500)
+#' # summary method
+#' # summary(fair500)
+#' ## summary "rolls"
+#' ##
+#' ## side count prop
+#' ## 1 a 63 0.126
+#' ## 2 b 54 0.108
+#' ## 3 c 73 0.146
+#' ## 4 d 69 0.138
+#' ## 5 e 69 0.138
+#' ## 6 f 51 0.102
+#' ## 7 g 65 0.130
+#' ## 8 h 56 0.112
+#' # Another example
+#' # roll 50 times
+#' # set.seed(123)
+#' # roll fair die 50 times
+#' # fair_die <- device(sides = 1:6, prob = rep(1/6, 6))
+#' # set.seed(123)
+#' # fair_50rolls <- roll(fair_die, times = 50)
+#' ## summary(fair_50rolls)
+#' ##   side count prop
+#' ## 1    1    11 0.22
+#' ## 2    2     8 0.16
+#' ## 3    3     9 0.18
+#' ## 4    4     8 0.16
+#' ## 5    5     7 0.14
+#' ## 6    6     7 0.14
+summary.rolls <- function(x) {
+  proportions <- c()
+  for (i in 1:length(x$sides)) {
+    proportions[i] <- (sum(x$rolls == x$sides[i]) / (x$total))
+  }
+  counts1 <- c()
+  for (i in 1: length(x$sides)) {
+    counts1[i] <- sum(x$rolls == x$sides[i])
+  }
+  freqs <- data.frame(
+    side = x$sides,
+    count = counts1,
+    prop = proportions)
+  obj <- list(freqs = freqs)
+  class(obj) <- "summary.rolls"
+  obj
+}
+
+
+#' @export
+print.summary.rolls <- function(x) {
+  cat('summary "rolls"\n\n')
+  print(x$freqs)
+  invisible(x)
+}
+
+#' @title Plot function
+#' @description takes in rolls object and outputs a plot of the proportions of the rolls object
+#' @param x any input that is of the class "rolls"
+#' @param y any input that should be the number of rolls the rolls object has (sample size)
+#' @return a plot of the proportions of the rolls object as the heights
+#' @export
+#' @examples
+#' # string die
+#' # str_die <- device(
+#' #  sides = c('a', 'b', 'c', 'd', 'e', 'f'),
+#' #  prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+#' # roll 20 times
+#' # set.seed(123)
+#' # str_rolls <- roll(str_die, times = 20)
+#' # plot(str_rolls)
+plot.rolls <- function(x, y = 50) {
+  table = summary(x)
+  barplot(table$freqs$prop,
+          names.arg = c(as.character(table$freqs$side)),
+          main = paste("Relative Frequencies in a series of",
+                              y, "rolls",
+                       sep =  " "),
+          xlab = "sides of device",
+          ylab = "relative frequences",
+          border = "grey")
+}
+
+#' @title `[.rolls` Extraction Method/Function
+#' @description extracts the specified value based on location/index from rolls object
+#' @param x rolls object
+#' @param i the location/index as a number
+#' @return the numeric/character element of that roll at the specific index
+#' @export
+#' @examples
+#' #' # string die
+#' # str_die <- device(
+#' #  sides = c('a', 'b', 'c', 'd', 'e', 'f'),
+#' #  prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+#' # roll 20 times
+#' # set.seed(123)
+#' # str_rolls <- roll(str_die, times = 20)
+#' # str_rolls[3]
+#' # str_rolls[4]
+"[.rolls" <- function(x, i) {
+  x$rolls[i]
+}
+
+
+#' @title `[<-.rolls` Replacement Method/Function
+#' @description extracts the specified value based on location/index from rolls object and replaces the value with one of the sides of the roll object
+#' @param x rolls object
+#' @param i the location/index as a number
+#' @param value the numeric/character element that will replace the ith character of the rolls object
+#' @return the numeric/character element of that roll at the specific index replaced with the value
+#' @export
+#' @examples
+#' #' # string die
+#' # str_die <- device(
+#' #  sides = c('a', 'b', 'c', 'd', 'e', 'f'),
+#' #  prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+#' # roll 20 times
+#' # set.seed(123)
+#' # str_rolls <- roll(str_die, times = 20)
+#' # str_rolls[3] <- "a"
+#' # str_rolls[3]
+#' # str_rolls[4] <- "e"
+#' # str_rolls[4]
+#' @export
+"[<-.rolls" <- function(x, i, value) {
+
+  if (!(value %in% x$sides)){
+    stop(sprintf('\nreplacing value must be %s or %s in', x$sides))
+  }
+  if (i > x$total | i < 1 ) {
+    stop("\nindex out of bounds or is not an integer")
+  }
+  x$rolls[i] <- value
+  x
+}
+
+
+#' @title `+.rolls` Addition Method/Function
+#' @description adds a given number of more rolls to a rolls object
+#' @param obj rolls object
+#' @param incr the number of more rolls to the rolls object
+#' @return a new rolls object with a greater sample size
+#' @export
+#' @examples
+#' #' # string die
+#' # str_die <- device(
+#' #  sides = c('a', 'b', 'c', 'd', 'e', 'f'),
+#' #  prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+#' # roll 20 times
+#' # set.seed(123)
+#' # str_rolls <- roll(str_die, times = 20)
+#' # newstr_rolls <- str_rolls + 10
+"+.rolls" <- function(obj, incr) {
+  if (length(incr) != 1 | incr <= 0) {
+    stop("\ninvalid increment")
+  }
+  original <- device(sides = obj$sides, prob = obj$prob)
+  more_turns <- roll(original, times = incr)
+  obj$rolls <- append(obj$rolls, more_turns$rolls)
+  obj$total <- obj$total + more_turns$total
+  obj
+
+}

@@ -1,0 +1,405 @@
+---
+title: "Warmup04 Sharon Hui"
+author: "Sharon Hui"
+date: "9/24/2018"
+output: html_document
+---
+
+```{r, eval = FALSE}
+mkdir warmup04
+cd warmup04
+curl -O https://raw.githubusercontent.com/ucb-stat133/stat133-fall-2018/master/data/nba2018.csv
+```
+
+Below is the description of variables in `nba2018.csv`:
+
+ - `player`: first and last names of player
+
+ - `number`: number on jersey
+
+ - `team`: 3-letter team abbreviation
+
+ - `position`: player’s position
+
+ - `height`: height in feet-inches
+
+ - `weight`: weight in pounds
+
+ - `birth_date`: date of birth (“Month day, year”)
+
+ - `country`: 2-letter country abbreviation
+
+ - `experience`: years of experience in NBA (a value of R means rookie)
+
+ - `college`: attended college in USA
+
+ - `salary`: player salary in dollars
+
+ - `rank`: Rank of player in his team
+
+ - `age`: Age of Player at the start of February 1st of that season.
+
+ - `games`: Games Played furing regular season
+
+ - `sames_started`: Games Started
+
+ - `minutes`: Minutes Played during regular season
+
+ - `field_goals`: Field Goals Made
+
+ - `field_goals_atts`: Field Goal Attempts
+
+ - `field_goals_perc`: Field Goal Percentage
+
+ - `points3`: 3-Point Field Goals
+
+ - `points3_atts`: 3-Point Field Goal Attempts
+
+ - `points3_perc`: 3-Point Field Percentage
+
+ - `points2`: 2-Point Field Goals
+
+ - `points2_atts`: 2-Point Field Goal Attempts
+
+ - `points2_perc`: 2-Point Field Goal Percentage
+
+ - `effective_field_goal_perc`: Effective Field 
+Goal Percentage
+
+ - `points1`: Free Throws Made
+
+ - `points1_atts`: Free Throw Attempts
+
+ - `points1_perc`: Free Throw Percentage
+
+ - `off_rebounds`: Offensive Rebounds
+
+ - `def_rebounds`: Defensive Rebounds
+
+ - `assists`: Assists
+
+ - `steals`: Steals
+
+ - `blocks`: Blocks
+
+ - `turnovers`: Turnovers
+
+ - `fouls`: Fouls
+
+ - `points`: Total points
+
+#### 1) Import the data in R
+
+```{r}
+library(readr)
+setwd("/Users/sharonhui/Desktop/warmup04")
+nba <- read_csv("nba2018.csv", col_names = TRUE,
+                col_types = list(player = "c",
+                team = "c",
+                height = "c",
+                birth_date = "c",
+                country = "c",
+                experience = "c",
+                college = "c",
+                position = col_factor(levels = c('C', 'PF', 'PG', 'SF', 'SG')),
+                
+                salary = "d",
+                field_goals_perc = "d",
+                points3_perc = "d",
+                points2_perc = "d",
+                points1_perc = "d",
+                effective_field_goal_perc = "d",
+                
+                number = "i",
+                weight = "i",
+                rank = "i",
+                age = "i",
+                games = "i",
+                games_started = "i",
+                minutes = "i",
+                field_goals = "i",
+                field_goals_atts = "i",
+                points3 = "i",
+                points3_atts = "i",
+                points2 = "i",
+                points2_atts = "i",
+                points1 = "i",
+                points1_atts = "i",
+                off_rebounds = "i",
+                def_rebounds = "i",
+                assists = "i",
+                steals = "i",
+                blocks = "i",
+                turnovers = "i",
+                fouls = "i",
+                points = "i"
+                ))
+str(nba)
+# read_csv()'s default for column types is integers.
+```
+
+#### 2) Right after importing the data
+
+`experience` should be of type character because of the presence of the R values that indicate
+rookie players. Replace all the occurrences of `"R"` with `0`, and then convert the entire column
+into integers. Display the `summary()` of this column.
+```{r}
+nba$experience[nba$experience == "R"] <- 0
+nba$experience <- as.integer(nba$experience)
+summary(nba$experience)
+```
+
+`salary` is originally measured in dollars. Transform salary so that you have salaries in millions: e.g. 1000000 should be converted to 1. Display the `summary()` of this column.
+```{r}
+nba$salary <- nba$salary/1000000
+summary(nba$salary)
+
+```
+
+`position` should be a factor with 5 levels: `'C'`, `'PF'`, `'PG'`, `'SF'`, `'SG'`. Relabel these factors using more descriptive names (see below). Display the frequencies of the relabeled factor with `table()`.
+```{r}
+levels(nba$position) <- c("center", "power_fwd", "point_guard", "small_fwd", "shoot_guard")
+table(nba$position)
+```
+
+#### 3) A bit of subscripting (i.e. indexing, slicing, subsetting)
+
+ - How many players went to UCLA (“University of California, Los Angeles”)? 
+ 
+ 14 players went to UCLA (“University of California, Los Angeles”).
+```{r}
+length(nba$player[nba$college == "University of California, Los Angeles"][!is.na(nba$player[nba$college == "University of California, Los Angeles"])])
+
+#another way to do this
+
+NROW(nba$player[which(nba$college == "University of California, Los Angeles")])
+```
+ 
+ - How many players went to Cal (“University of California, Berkeley”)? 
+ 
+ 0 players went to Cal (“University of California, Berkeley”).
+```{r}
+length(nba$player[nba$college == "University of California, Berkeley"][!is.na(nba$player[nba$college == "University of California, Berkeley"])])
+
+#another way is 
+
+NROW(nba$player[which(nba$college == "University of California, Berkeley")])
+```
+ 
+ - What’s the largest weight value? 
+ 
+ 290 is the largest weight value.
+```{r}
+nba$weight[which.max(nba$weight)]
+
+```
+ 
+ - Who are the players with the largest weight value?
+ 
+The player with the largest weight value is Boban Marjanovic.
+```{r}
+nba$player[which.max(nba$weight)]
+
+```
+
+ - What’s the overall average weight? 
+ 
+The overall average weight is 219.9119 pounds.
+```{r}
+mean(nba$weight)
+```
+ - What is the median salary of all players? 
+
+The median salary of all players is 3 million dollars.
+```{r}
+#The median value is in millions
+median(nba$salary)
+```
+
+
+ - What is the median salary of the players with 10 years of experience or more?
+
+4.8375 million dollars is the median salary of the players with 10 years of experience or more.
+```{r}
+#The median value is in millions
+median(nba$salary[nba$experience >= 10])
+```
+ 
+ - What is the median salary of Shooting Guards (SG) and Point Guards (PG)? 
+ 
+2.789697 million dollars is the median salary of Shooting Guards (SG) and Point Guards (PG).
+```{r}
+#The median value is in millions
+median(nba$salary[(nba$position == "point_guard") | nba$position == "shoot_guard"])
+```
+
+The median salary of the shooting guards is 2.884406.
+```{r} 
+#The median value is in millions
+median(nba$salary[nba$position == "shoot_guard"])
+
+```
+
+The median salary of the point guards is 2.704291.
+```{r}
+#The median value is in millions
+median(nba$salary[nba$position == "point_guard"])
+```
+
+ 
+ - What is the median salary of Power Forwards (PF), 30 years or older, weighing 240 pounds or more?
+ 
+8 million dollars is the median salary of Power Forwards (PF), 30 years or older, weighing 240 pounds or more.
+```{r}
+median(nba$salary[(nba$position == "power_fwd") & (nba$age >= 30) & (nba$weight >= 240)])
+
+
+```
+
+ - Create a data frame `gsw` with the player name, position, height, weight, and age of Golden State Warriors (GSW). Display this data frame.
+```{r}
+gsw <- data.frame(nba$player[nba$team == "GSW"], nba$position[nba$team == "GSW"], nba$height[nba$team == "GSW"], nba$weight[nba$team == "GSW"], nba$age[nba$team == "GSW"])
+names(gsw) <- c("Player", "Position", "Height", "Weight", "Age")
+gsw
+
+```
+
+
+#### 4) Performance of players
+Performance of NBA players can be measured in various ways. 
+Perhaps the most popular performance measure is known as the “Efficiency” statistic, simply referred to as EFF.
+According to Wikipedia, EFF computes performance as an index that takes into account basic individual statistics: points, rebounds, assists, steals, blocks, turnovers, and shot attempts (per game). It is derived by a simple formula: 
+
+According to [Wikipedia](https://en.wikipedia.org/wiki/Basketball_statistics), EFF computes performance as an index that takes into account basic individual statistics: points, rebounds, assists, steals, blocks, turnovers, and shot attempts (per game). It is derived by a simple formula:
+
+`EFF = (PTS + REB + AST + STL + BLK - Missed FG - Missed FT - TO) / GP`
+
+ - `EFF`: efficiency
+ - `PTS`: total points
+ - `REB`: total rebounds
+ - `AST`: assists
+ - `STL`: steals
+ - `BLK`: blocks
+ - `Missed FG`: missed field goals
+ - `Missed FT`: missed free throws
+ - `TO`: turnovers
+ - `GP`: games played
+ 
+You will have to compute the efficiency (EFF) for each player. In order to do this, you’ll have to add the following variables to the main data frame:
+
+ - `missed_field_goals` (missed field goals) 
+
+ - `missed_free_throws` (missed free throws)
+ 
+ - `rebounds` (total rebounds: offensive and defensive) 
+ 
+ - `mins_game` (minutes per game; NOT to be used when calculating EFF)
+ 
+```{r}
+nba$missed_field_goals <- (nba$field_goals_atts - nba$field_goals)
+nba$missed_free_throws <- (nba$points1_atts - nba$points1)
+nba$rebounds <- (nba$off_rebounds + nba$def_rebounds)
+nba$mins_games <- (nba$minutes/nba$games)
+```
+
+Once you have all the necessary statistics, add a column efficiency to the data frame using
+the formula provided above.
+```{r}
+nba$efficiency <- ((nba$points + nba$rebounds + nba$assists + nba$steals + nba$blocks - nba$missed_field_goals - nba$missed_free_throws - nba$turnovers))/nba$games
+
+```
+
+Compute `summary()` statistics for efficiency and graph its histogram. Add color to the
+bars in the histograms, and make sure it includes descriptive axis labels, as well as a title.
+```{r}
+summary(nba$efficiency)
+sd(nba$efficiency)
+hist(nba$efficiency, xlab = "Efficiency", ylab = "Frequency", main = "Histogram of NBA Players' Efficiency", col = c("darkslategray1", "darkmagenta", "darkorange3", "firebrick4", "goldenrod3", "chartreuse", "cornsilk2", "dimgrey"))
+```
+
+Display the player name, team, salary, and efficiency value of the top-10 players by EFF in
+decreasing order (display this information in a data frame).
+Did you find players with a negative EFF? If yes, display their names.
+```{r}
+firstten <- (data.frame(nba$player, nba$team, nba$salary, nba$efficiency))
+topten <- firstten[with(firstten, order(-nba.efficiency)),]
+names(topten) <- (c("Player", "Team", "Salary", "Efficiency"))
+head(topten, n = 10)
+
+# Another method to obtain the top ten
+top_ten_1 <- data.frame(
+  Player = head(nba$player[order(nba$efficiency, decreasing = TRUE)], n = 10),
+  Team = head(nba$team[order(nba$efficiency, decreasing = TRUE)], n = 10),
+  Salary = head(nba$salary[order(nba$efficiency, decreasing = TRUE)], n = 10),
+  Efficiency = head(sort(nba$efficiency, decreasing = TRUE), n = 10)
+)
+top_ten_1
+
+nba$player[nba$efficiency < 0]
+```
+The players with the negative efficiency are 
+"Gary Neal," "Axel Toupane," "Patricio Garino," and "Ben Bentil."
+
+#### 5) Further Exploration 
+
+Answer the following questions, and provide numerical and/or graphical evidence to support your answer: 
+
+ - The more efficient a player is, the higher his salary? 
+```{r}
+plot(nba$efficiency, nba$salary, main = "Efficiency vs Salary of NBA Players", xlab = "Efficiency", ylab = "Salary", cex = 0.6, col = "darkslategray4")
+cor(nba$efficiency, nba$salary)
+```
+```{r}
+plot(nba$efficiency, log(nba$salary), main = "Efficiency vs Salary of NBA Players", xlab = "Efficiency", ylab = "Log Transformation Salary", cex = 0.6, col = "darkslategrey")
+```
+
+I decided to not use the log transformed values of NBA salaries because the plot that was created using `plot(nba$efficiency, log(nba$salary))` did not seem to be linear.
+
+
+From the scatterplot, one can see that the relationship between salaries and efficiency for NBA players is approximately positive linear. The correlation between NBA players' salaries and efficiencies is about 0.6731314, indicating a fairly strong relationship between salaries and efficiencies. This means that as a player's efficiency increases, his or her salary also tends to increase. It is true that the more efficient a player is, the higher his salary tends to be.
+
+
+ - As players get older, do they tend to become more efficient? 
+```{r}
+plot(nba$age, nba$efficiency, main = "Age vs Efficiency of NBA Players", xlab = "Age", ylab = "Efficiency", cex = 0.6, col = "darkviolet")
+cor(nba$age, nba$efficiency)
+```
+From the scatterplot, one can see that the relationship between age and efficiency for NBA players is not obvious. The correlation between NBA players' salaries and efficiencies is about 0.04245338, indicating a very weak positive relationship between age and efficiencies. This means that as a player's age increases, his or her efficiency also tends to increase, but the relationship between age and efficiency is weak. It would be difficult to predict a player's efficiency given his age. Age and efficiency appear to not have a relationship. As players get older, one cannot say that they tend to become more or less efficient.
+
+
+ - Does the rank of a player seem to be associated with his efficiency (i.e. the more important the rank, the more efficient)?
+
+```{r}
+plot(nba$rank, nba$efficiency, main = "Rank vs Efficiency of NBA Players", xlab = "Rank", ylab = "Efficiency", cex = 0.6, col = "goldenrod3")
+cor(nba$rank, nba$efficiency)
+```
+The rank of a player seems to be strongly negatively associated with his efficiency. As the rank number of a player increases, the less efficiency the player has. The correlation between rank and efficiency is about -0.7072306, which indicates a fairly strong negative relationship between rank and efficiency. It seems to be true that the more important the rank (having a lower-number rank), the more efficient a player tends to be. (Notice that being ranked number 1 or 2 is better than being ranked 200 or 300).
+
+#### 6) Comments and Reflections 
+
+Reflect on what was hard/easy, problems you solved, helpful tutorials you read, etc. 
+
+How much time did it take to complete this HW?
+What things were hard, even though you saw them in class/lab? 
+What was easy(-ish) even though we haven’t done it in class/lab? 
+Did you need help to complete the assignment? If so, what kind of help? 
+What was the most time consuming part?
+Was there anything that you did not understand? or fully grasped? 
+Was there anything frustrating in particular?
+
+ - I took about 6 hours to complete this homework.
+ 
+ - One difficult part of the lab included subsetting to find out how many players went to UCLA ("University of California, Los Angeles") and how many of the players went to Cal ("University of California, Berkeley"). Typically, I used length to find out how many players went to call, but kept obtaining the incorrect number until I realized that I needed to prevent R from counting the "FALSE" elements.
+ 
+ - Another difficult part of the lab was importing the data and specfying the data-type for each column because I kept getting "1 parsing failure". Several people in the class were obtaining this warning.
+ 
+ - One thing that was fairly easy even though we haven’t done it in class/lab was using numerical and/or graphical evidence to support
+your answer. Although we have not discussed how to do this explicitly in class, we can check how closely related two variables are by looking at the scatterplot to check if the relationship between two variables is linear. We can also use a scatterplot and correlation coefficient to examine if the relationship is positive or negative.
+
+ - I needed help to complete the assignment due to the parsing failure warning that I was given. After using `read_csv`, I was not able to do anything to remove the parsing error. I went onto Piazza and noticed that several other people were obtaining the same warning. `Derrick Williams` has a number that went from 3 to 32.
+ 
+ - The most time-consuming part was trying to understand why I was obtaining the parsing failure, but a few other students did not have the parsing failure.
+ 
+ - One thing that I have not fully understood/grasped was the parsing failure and why it worked for some students but not for others.
+ 
+ - The most frustrating part of the assignment was understanding the assignment. During the lab discussion, since I had finished Lab 04, I decided to start on Warm Up 04. I spent most of my time trying to understand the how the `read_csv` and `col_types` was used and why I was obtaining the parsing failure warning.

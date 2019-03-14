@@ -1,0 +1,259 @@
+---
+title: "Lab 4: Git and GitHub Basics"
+author: "Sharon Hui"
+date: "9/19/2018"
+output: html_document
+---
+
+
+
+### Part 1) Git Workshop
+
+The first part of the lab involves working on the workshop Version Control with Git by Software Carpentry, especifically parts 3 to 7 (I’m assuming that you have Git setup in your machine). The next step is to introduce yourself to Git by running a couple of configuration commands. Basically, you need to tell Git who you are, and what your email is. Run the following commands using your own user name and your own email.
+```{r, eval = FALSE}
+# use your own user name
+git config --global user.name "Sharon Hui"
+
+# use your own email
+git config --global user.email "sharonwhui0066@berkeley.edu"
+
+# colors
+git config --global color.ui "auto"
+
+
+```
+
+
+
+### Part 2) Git and GitHub Practice
+
+The second part of the lab includes working on a second baby project with Git. Some resources may be useful
+
+ - Chapters 1 **Getting Started** and sections 2.1 to 2.5 in chapter 2 **Git Basics**, of the [Pro Git](!https://git-scm.com/book/en/v2) by Scott Chacon and Ben Straub
+ 
+ - [Github Git Cheat Sheet](!https://education.github.com/git-cheat-sheet-education.pdf) 
+
+#### 1) Create a new Github Repository
+
+ - Open your browser and Sign in to your github account.
+ 
+ - Locate the `+` button (next to your avatar).
+ 
+ - Select the `New repository` option.
+Choose a name for your repository: e.g. `demo-repo`.
+
+ - In the **Description** field add a brief description: e.g. “this is a demo repo”
+ 
+ - Use the default settings, and click the green button **Create repository**.
+ 
+ - You should see some content similar (but not identical) to the one in the lab.
+
+This is what I saw after creating the repository.
+
+```{r, eval = FALSE}
+echo "# demo-repo" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/swhui/demo-repo.git
+git push -u origin master
+
+
+```
+
+
+#### 2) Create a local Git Repository
+
+ - Open the terminal (Mac Terminal, or Git-Bash for Windows users). 
+
+ - Optional: change directory to your preferred location e.g. your Desktop.
+
+ - Create a directory with the name of your github repo.
+ 
+ - Initialize the directory as a git repository.
+
+```{r, eval = FALSE}
+cd Desktop
+mkdir demo-repo
+cd demo-repo
+git init
+xcode-select --install # I did not need to run this command.
+```
+
+Since I did not encounter the error message, I did not need to use this command. However, it is important to note that it is possible for Mac users to have a message with a missing component for `CommandLineTools`
+
+The command `git init` will set up the directory `demo-repo` as a Git repository (NOT to confused with your GitHub repository); this is basically the local repository.
+
+#### 3) Adding a README file
+
+ - It is customary to add a README.md file at the top level. This file must contain (at least) a description of what the repository is about. The following command will create a README.md file with some minimalist content:
+ 
+```{r, eval = FALSE}
+echo "# Demo Repo" >> README.md
+```
+
+
+ - So far you have a “new” file in your local repo, but this change has not been recorded by Git. You can confirm this by checking the status of the repo:
+
+```{r, eval = FALSE}
+git status
+# This command showed me that there were no commits and an untracked file, which was the README.md file.
+```
+
+
+ - Notice that Git knows that README.md is untracked. So let’s add the changes to Git’s database:
+```{r, eval = FALSE}
+git add README.md
+```
+
+ - Check the status of the repo again:
+ 
+```{r, eval = FALSE}
+
+git status 
+# This showed me that there was a new changes that needs to be committed, which is the new file: README.md.
+
+```
+
+ - Git is now tracking the file `README.md`
+
+ - Next thing that we need to do is **committing** the changes. It's always a good practice to include a meaningful message for your commit.
+```{r, eval = FALSE}
+git commit -m "first commit"
+# This shows me that 1 file changed with 1 insertion.
+
+```
+
+#### 4) Adding a remote
+
+As of now, I have a local git repository in my computer and a remote GitHub repository in my GitHub account. Both repositories have the same name, so now I need to link them. To do this, I need to tell Git that a remote repository (i.e. the one in GitHub) will be added.
+
+ - To add a remote repository, I need to do the command `git remote add origin https://github.com/username/demo-repo.git` but I have to replace the username with swhui (my username).
+ 
+```{r, eval = FALSE}
+
+git remote add origin https://github.com/swhui/demo-repo.git
+
+```
+
+To verify my new remote, I have to use `git remote -v`. If everything is okay, I should see the following:
+```{r, eval = FALSE}
+git remote -v
+# Verify new remote
+origin	https://github.com/swhui/demo-repo.git (fetch)
+origin	https://github.com/swhui/demo-repo.git (push)
+
+```
+
+#### 5) Pushing changes to a remote repo
+
+ - Now that I have linked the local repo with my remote repo, I can start pushing/uploading commits to GitHub. I need need to constantly check the status of my repo using `git status`
+ 
+ - Now I need to push my recent commit to the remote branch (`origin`) from my local branch (`master`):
+
+```{r, eval = FALSE}
+git push origin master
+```
+
+ - Go to your Github repository and refresh the browser. If everything went fine, you should be able to see the contents of your customized README.md file.
+
+I went to the GitHub repository and see the contents of my customized README.md file.
+
+ - Keep modifying the content of README.md file, add the modifications to the git repository, display the status, commit the modifications, and push them to github repo.
+
+I added two lines:
+`This is a modification to the git repository. I need to display the status, commit the modifications, and push them to the GitHub repo.`
+and
+`For this lab, we were supposed to create a GitHub repository, create a local Git repository, price adding, and committing changes your local Git repo, and practice pushing committed changes to a remote repo.`
+
+```{r, eval = FALSE}
+git status # It states that the README.md file has been edited.
+git add README.md
+git status
+git commit -m "second commit with a description about Lab 04"
+git push origin master
+```
+
+
+#### Part 3) Your GitHub Classroom Repository
+
+The last part of the lab involves setting up your GitHub Classroom repository. Please follow the instructions of the pdf (shown below), available in the labs/ folder of the course github repo:
+
+lab04-github-classroom.pdf
+
+You don’t need to include descriptions or code of this 3rd part in your .Rmd lab.
+
+#### Local Repo and the Remote Repo
+
+```{r, eval = FALSE}
+mkdir hw-stat133
+cd hw-stat133
+git init
+git remote add origin https://github.com/stat133-f18/hw-stat133-swhui.git
+git pull origin master
+```
+
+In the computer, I need to open the README.md file that is inside the `demo/` folder. Under the title Demo, I saw
+`This is just a demo folder with some dummy content.`
+and replaced it with
+`This is just a demo folder for testing purposes.`
+Now I needed to do the following
+
+ - Save the changes made in `README.md`. 
+ 
+ - Go to the bash terminal. 
+ 
+ - Change directory to the `demo/` folder:
+ 
+ - Check the status
+ 
+ - Add the changes to git:
+ 
+ - Commit the changes with a descriptive message:
+ 
+ - Push the changes to the remote repo (origin) from my local repo (master)
+
+
+```{r, eval = FALSE}
+cd demo
+git status
+git add README.md
+git commit -m "demo: update readme file" 
+#It stated that 1 file changed with 1 insertion and 1 deletion.
+cd ..
+git push origin master
+```
+
+After going to my Github repository and refreshing my browser, I see that everything went fine. I was able to see the contents of the `README.md` file inside demo/.
+
+#### Push your Warm-up 1 assignment
+
+Let’s add your warmup1 `.Rmd` file, and its knitted file, to your local repo, and then push the
+modifications to your remote repo.
+
+ - Copy the `.Rmd` file of the first warm-up assignment and save it inside the folder `warmup1/` (of your local repo).
+ 
+ - Open the `.Rmd` file and modify the output field of the yaml header: instead of using
+output: `html_document`, change it to: output: `github_document`.
+
+ - Knit the `.Rmd file`. This should generate an `.md file.`
+ 
+ - Go to the bash terminal and check the status
+ 
+```{r, eval = FALSE}
+cd ..
+cd hw-stat133
+mkdir warmup1
+cp ../warmup01-sharon-hui.Rmd ./warmup1
+cd warmup1
+ls
+open warmup01-sharon-hui.Rmd
+#Then I changed the yaml header such that instead of using output : `html_document`, I changed it to output: `github_document`. Then, I knit the `Rmd.file`, which generated an `.md file`.
+cd ..
+git status
+git add warmup1
+git commit -m "warmup1: add Rmd and md files"
+git push origin master
+```
+
+After going to my Github repository, I can see that the .Rmd and .md files are in the warmup1 directory.

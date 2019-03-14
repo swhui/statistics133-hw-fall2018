@@ -1,0 +1,208 @@
+---
+title: "Workout 03 Roller Report"
+author: Sharon Hui
+date: 11/30/2018
+output: github_document
+---
+
+## About "Roller"
+
+The following R code chunk is how you will load the package `"Roller"` into R.
+
+```{r}
+library(Roller)
+```
+
+The main purpose of this assignment is to create an R package that implements the use of functions to simulate rolling an object such as a coin or die multiple times.
+
+This package includes two classes of objects, which are the following:
+
+1) the `"device"` to be rolled
+
+2) the object `"rolls"` (containing the rolls of the `"device"`)
+
+## Device Rolling
+
+The package `"Roller"` is a minimal implementation for simulating rolling a device a given number of times. `"Roller"` can also be used to visualize the relative frequencies in such a series of rolls.
+
+## Creating a `device`
+
+The first step would be to create a `"device"` object with the function `device()`:
+
+```{r}
+fair_coin <- device()
+fair_coin
+```
+
+By default, `device()` creates a _fair_ device with standard sides `1`, `2`, and with probability values for `1` to be 0.5 and `2` to be 0.5. Probabilities values must sum up to 1.
+
+You can change the default arguments `sides` and `prob` in the `device()`.
+
+```{r}
+# one example
+weird_die <- device(
+  sides = c('i', 'ii', 'iii', 'iv'),
+  prob = rep(1/4, 4)
+  )
+weird_die
+
+# second example
+fruit_die <- device(
+  sides = c("apples", "bananas", "oranges"),
+  prob = c(2/3, 1/6, 1/6)
+)
+fruit_die
+```
+
+## Rolling the device
+
+After you have defined the `"device"` object, you can use the function `roll()` to roll the device a specified number of `times`. The output of `roll()` will be a list with the following four elements:
+
+ - `rolls`: vector with outputs of the rolls
+ - `sides`: vector with the sides of the `"device"` object
+ - `prob`: vector with probabilities for each side of the `"device"` object
+ - `total`: total number of rolls (i.e. `times`)
+ 
+However, `roll()` will only print the class of the object and the generated `rolls`. In other words, it will display the class of the object (`rolls`) and the rolls. To call/display the other elements such as `sides`, `prob`, and `total`, use `$`.
+
+```{r}
+# create a device called fair_die with sides, 1 to 6, each with a probability of 1/6
+fair_die <- device(sides = 1:6, prob = rep(1/6, 6))
+# roll fair_die 50 times
+set.seed(123)
+fair_50rolls <- roll(fair_die, times = 50)
+# print the object
+fair_50rolls
+# to display the rolls vector with outputs of the rolls
+fair_50rolls$rolls
+# to display the sides vector with the sides of the `"device"` object
+fair_50rolls$sides
+  
+# to display the prob vector with probabilities for each side of the `"device"` object
+fair_50rolls$prob
+# to display the total number of rolls
+fair_50rolls$total
+# to display what is in fair_50rolls
+names(fair_50rolls)
+```
+
+```{r}
+# new example with fruit_die
+set.seed(123)
+fruit_roll50 <-  roll(fruit_die, times = 50)
+# printing the rolls object
+fruit_roll50
+# to display the rolls vector with outputs of the rolls
+fruit_roll50$rolls
+# to display the sides vector with the sides of the `"device"` object
+fruit_roll50$sides
+# to display the prob vector with probabilities for each side of the `"device"` object
+fruit_roll50$prob
+# to display the total number of rolls
+fruit_roll50$total
+# to display what is in fair_50rolls
+names(fruit_roll50)
+```
+
+Here is another example of using the rolls.
+
+```{r}
+# creating a string die device
+str_die <- device(
+sides = c('a', 'b', 'c', 'd', 'e', 'f'),
+prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+# roll str_die 20 times
+set.seed(123)
+str_rolls <- roll(str_die, times = 20)
+# print the object
+str_rolls
+# to display the rolls vector with outputs of the rolls
+str_rolls$rolls
+# to display the sides vector with the sides of the `"device"` object
+str_rolls$sides
+  
+# to display the prob vector with probabilities for each side of the `"device"` object
+str_rolls$prob
+# to display the total number of rolls
+str_rolls$total
+# to display what is in fair_50rolls
+names(str_rolls)
+```
+
+The `summary()` function for rolls also gives you a table of frequencies including the side (`side`), count (`count`), and proportion (`prop`). The summary method returns an object, `"summary.rolls"` and the otput wil be a list containing a data frame called `freqs` with the three columns, `side`, `count`, and `prop`.
+
+ - The `side` column gives the sides of the rolled `device`.
+ - The `count` column gives the frequency (count) of each side of the rolled device.
+ - The `prop` column gives the relative frequency (proportion) of each side of the rolled `device`.
+
+
+```{r}
+# creates the summary.rolls object for str_rolls
+summary(str_rolls)
+# to display the side column of the `device`
+summary(str_rolls)$freq$side
+# to display the count column of the `device`
+summary(str_rolls)$freq$count
+# to display the prop column of the `device`
+summary(str_rolls)$freq$prop
+# to display the names of the `summary.rolls` device, `str_rolls`
+names(summary(str_rolls))
+# to display the class of str_rolls
+class(summary(str_rolls))
+```
+
+## More Functions for the Object `"rolls"`
+
+You can use the `"["` to extract the value of the given roll. This is an extraction method.
+```{r}
+# roll fair 8-sided die
+set.seed(123)
+fair_dev <- device(sides = letters[1:8], prob = rep(1/8, 8))
+fair500 <- roll(fair_dev, times = 500)
+# summary method
+summary(fair500)
+# extracting the roll in position 500
+fair500[500]
+```
+
+You can use the `"[<-"`to replace the value of a given roll. This is an replacement method.
+
+```{r}
+# replacing a roll in position 500
+fair500[500] <- 'a'
+fair500[500]
+```
+
+This will change the summary of `fair500`.
+```{r}
+# look at the new summary for fair 500
+summary(fair500)
+```
+
+You can use the `"+"` to add more rolls. This is an addition method.
+```{r}
+# adding 100 rolls
+fair600 <- fair500 + 100
+# this is the summary of fair600
+summary(fair600)
+```
+
+
+## Plotting Counts and Relative Frequencies of Rolls
+
+You can use the function `plot()` to create a graohic with the relative 
+frequencies of a series of device rolls:
+
+```{r, fig.show='hold', fig.width = 7, fig.height = 4, fair_50rolls}
+# plotting fair_50rolls using the plot method
+plot(fair_50rolls)
+```
+```{r, fig.show='hold', fig.width = 7, fig.height = 4, fair500}
+# plotting fair500 using the plot method
+plot(fair500, 500)
+```
+
+
+
+
+

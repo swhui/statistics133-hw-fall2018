@@ -1,0 +1,191 @@
+---
+title: "Warm-Up 01 - R Markdown Syntax"
+author: "Sharon Hui"
+date: "9/3/2018"
+output:
+  github_document
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Game of Thrones 
+
+Visit [_Game of Thrones Wiki_](http://gameofthrones.wikia.com) and choose one of the characters (e.g. [Tyrion Lannister](http://gameofthrones.wikia.com/wiki/Tyrion_Lannister)). 
+
+Use markdown syntax to write the following about the character you chose: 
+
+ - Include one of the character’s quote using a markdown blockquote. 
+
+ - Include an image of the character. 
+
+ - Use a markdown table with two columns to include things like status, date of birth, origin, allegiance, etc (see screen-shot above). \
+
+
+
+## _Samwell Tarly_
+
+>  _"We didn't build 500 miles of ice wall 700 feet high to keep out men. The night is gathering, Maester Aemon, I've seen it. It's coming for all of us."_
+―Samwell Tarly
+
+
+![Image of Samwell Tarly](https://vignette.wikia.nocookie.net/gameofthrones/images/e/e9/Sam_at_Winterfell.jpg/revision/latest?cb=20170903200558)
+
+|               |                                          |
+| :------------ |  --------------------------------------: |
+|        Status | Alive  |
+|           Age | 24 in Season 7  |
+| Date of birth |  280 AC  |
+|        Origin | Horn Hill  |
+|    Allegiance |  Night's Watch (by oath)  |
+|               |  House Tarly (by birth)  |
+|   Predecessor |        Unknown  |
+|     Successor |  Unknown  |
+|       Culture |      Andal  |
+|      Religion |     \    Old Gods of the Forest (convert)  |
+|               |        \    Faith of the Seven (formerly)  |
+|        Father |     Randyll Tarly  |
+|        Mother |  Melessa Florent  |
+
+
+\ 
+
+The link to Samwell Tarly is [here!](http://gameofthrones.wikia.com/wiki/Samwell_Tarly)
+
+\newpage
+
+# Cooking Recipe
+Visit [Smitten Kitchen](https://smittenkitchen.com) and choose one recipe (e.g. root vegetable gratin). Write about the recipe using Markdown syntax:
+
+ - Use an **unordered** list (of bullets) to list the ingredients.
+ - Use another unordered list to list any “special” kitchen tools that are needed. 
+ - Describe the steps of the recipe.
+ - Include an image to show the appearance of the meal.
+ - Is there a special season of the year for it? Are there variations of the recipe? Using other ingredients?
+
+---
+
+## _Melting Potatoes_
+
+### Ingredients
+ - 4 tablespoons unsalted butter, melted 
+ - 2 teaspoons chopped fresh thyme or rosemary leaves
+ - 1 teaspoon kosher salt 
+ - 1/2 teaspoon freshly ground black pepper 
+ - 2 pounds yukon gold potatoes, peeled, cut into 1-inch slices 
+ - 1 cup chicken or vegetable stock or low-sodium broth 
+ - 3 to 4 garlic cloves, peeled and smashed
+
+### Special Kitchen Tools and Equipment
+ - Oven 
+ - Large bowl
+ - 9x13 metal baking pan
+ - Thin spatula 
+ - Large pan
+ 
+### Steps of the Recipe
+1. Heat oven to 500 °F
+2. Place melted butter in the bottom of a large bowl.
+3. Stir in herbs, if using, salt, and pepper.
+4. Add potato slices and mix to evenly coat them. 
+5. Spread potato slices and all of the good stuff at the bottom of the bowl in a 9×13 metal baking pan.
+6. Roast potatoes for 15 minutes. 
+7. Use a thin spatula to loosen potatoes and turn them over. 
+8. Roast for a second time for 15 minutes, then carefully pour stock or broth into pan and add the garlic cloves. 
+9. Roast for 15 minutes more or until potatoes are fully tender.
+10. Remove from oven.
+11. Transfer to a serving platter along with any remaining liquid in pan and serve warm.
+
+![Appearance of the Meal, Melting Potatoes](https://farm1.staticflickr.com/812/27201919058_534eb7d0b7_z.jpg)
+
+**Since Yukon Gold potatoes are available year-round, you can enjoy this recipe at any time of the year! There are other variations of this recipe, which include using duck fat or olive oil instead of butter.**
+
+The link to the article is [here!](https://smittenkitchen.com/2018/03/melting-potatoes/)
+
+
+\newpage
+
+# Quadratic Equation
+Visit the wikipedia page for the [quadratic equation](https://en.wikipedia.org/wiki/ Quadratic_equation). \ 
+
+Write the general form of a quadratic equation, and provide a brief description for it: \ 
+
+ \[ ax^2 + bx + c = 0 \]
+
+The quadratic equation is any equation with the form \[ ax^2 + bx + c = 0 \] where x is the only unknown and _a_, _b_, and _c_ represent known numbers given that _a_ is not equal to 0. If _a_ is equal to 0, then the equation is linear, not quadratic. \ 
+
+Write the formula for the roots of the general quadratic equation:
+
+ \[ x = \frac{-b \pm {\sqrt {b^2 - 4ac}}} {2a} \]
+
+Also, write the derivation of the solution:
+ \[ ax^2 + bx + c = 0 \]
+ \[ 4a^2x^2 + 4abx + 4ac = 0 \]
+ \[ 4a^2x^2 + 4abx = -4ac \]
+ \[ 4a^2x^2 + 4abx + b^2 = b^2 - 4ac \]
+ \[ (2ax+b)^2 = b^2 - 4ac \]
+ \[ 2ax+b = \pm \sqrt {b^2 - 4ac} \]
+ \[ 2ax = -b \pm \sqrt {b^2 - 4ac} \]
+ \[ x = \frac{-b \pm {\sqrt {b^2 - 4ac}}} {2a} \]
+
+---
+\newpage
+
+# Comments and Reflections 
+
+Reflect on what was hard/easy, problems you solved, helpful tutorials you read, etc. Here are some questions that you can start with to provide comments on your HW. 
+
+\ 
+
+1. What things were hard, even though you saw them in class?\ 
+
+ - Some things that were difficult was understanding what the different data types were. Although we did not need to know about data types for this particular warm up assignment, I thought understanding the differences between the data types was slightly confusing.
+
+ - Another thing that was hard was making the hyperlinks appear blue in the text in a pdf file.
+
+\ 
+
+2. What was easy(-ish) even though we haven’t done it in class?\ 
+
+ - One part that was easy was creating an image and creating a link to the image so that it would show up on the R Markdown. 
+ 
+ - Another part that was fairly easy was writing the math equations using Latex notation.
+
+\ 
+
+3. Was this the first time you were using markdown? If yes, how do you feel about it?\ 
+
+While this was not the first time I was using markdown, I had not used markdown in over a year. While I had learned about R in my Statistics 20 class, I only learned a limited amount about RStudio from Statistics 20. This warm up assignment was extremely helpful as an introduction to using the markdown.
+
+\ 
+
+4. If you have used markdown before, was there something new you learned while doing this assignment?\ 
+
+ - There were plenty of new things that I learned while doing this assignment, such as making a markdown table and aligning the words in the table. That part was the most tricky part for me. 
+ 
+ - I also learned that we can create blockquotes, which, in my opinion, make the pdf and html files look aesthetically pleasing.
+
+\ 
+
+5. Did you need help to complete the assignment? If so, what kind of help? Who helped you?\ 
+
+ - I did need help to complete the assignment to make sure that I was understanding what I was typing. I had help from the GSIs during the lab section. 
+ 
+ - However, the main resource that I used were the markdown tutorials that were provided in the first lab. The markdown tutorial was helpful because they gave us examples and practice problems to try before I worked on the actual assignment.
+
+\ 
+
+6. How much time did it take to complete this HW?\ 
+
+It took about three hours to complete this homework, including reviewing the useful links that were included in the homework.
+
+\ 
+
+7. What was the most time consuming part?\ 
+
+ - The most time consuming part was making the table for the warm-up since it was a markdown table. At first, I had trouble aligning the words/phrases in the correct place. 
+
+ - The Markdown tutorials by CommonMark and RStudio were the most helpful, even though they were time-consuming. The tutorials helped me understand how to write content using markdown syntax with examples and practice exercises.
